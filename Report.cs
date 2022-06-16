@@ -72,12 +72,10 @@ namespace Company.Function
                             .AddEnvironmentVariables()
                             .Build();
                 string userNameKeyVault = Environment.GetEnvironmentVariable("WebHookAuth", EnvironmentVariableTarget.Process);
-                log.LogInformation(usernamePassword);
                 if (usernamePassword != userNameKeyVault)
                 {
                     return new HttpResponseMessage(HttpStatusCode.Unauthorized);
                 }
-
                 ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
                 using (ExcelPackage excel = new ExcelPackage())
                 {
@@ -101,8 +99,8 @@ namespace Company.Function
                         JToken responseBody = JToken.FromObject(documentItem);
                         foreach (ReportHeader a in Enum.GetValues(typeof(ReportHeader)))
                         {
-                            string cellValue = responseBody[a.ToString()] != null ? responseBody[a.ToString()].ToString() : null;
-                            worksheet.Cells[row, (int)a + 1].Value = cellValue.Replace("\n", "").Replace("\r", "");
+                            string cellValue = responseBody[a.ToString()] != null ? responseBody[a.ToString()].ToString().Replace("\n", "").Replace("\r", "") : null;
+                            worksheet.Cells[row, (int)a + 1].Value = cellValue;
                         }
                         row = row + 1;
                     }
