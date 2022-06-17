@@ -439,11 +439,6 @@
         "functionHostName":{
             "type":"string",
             "value": "[reference(resourceId('Microsoft.Web/sites',  variables('funcAppName')), '2018-02-01').defaultHostName]"
-
-        },
-        "secretValuePair":{
-            "type":"string",
-            "value":"[reference(resourceId('Microsoft.KeyVault/vaults/secrets', variables('KeyVaultName'), parameters('secretName'))).value]"
         }
     }
     
