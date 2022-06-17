@@ -30,7 +30,7 @@
         },
         "GitHubBranch": {
             "type": "string",
-            "defaultValue": "report",
+            "defaultValue": "main",
             "metadata": {
                 "description": "Name of the branch to use when deploying."
             }
