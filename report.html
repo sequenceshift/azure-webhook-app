@@ -5,7 +5,7 @@
     <style>
         .box {
             width: 100%;
-            max-width: 800px;
+            max-width: 900px;
             padding: 15px 25px;
             margin: 50px auto 0 auto;
             border-radius: 4px;
@@ -13,21 +13,29 @@
             justify-content: center;
         }
 
-        .box label {
+        label {
+            display: table-cell;
+            text-align: right;
             margin-left: 10px;
             color: #e0dcd8;
             font-weight: bold;
             width: 150px;
         }
 
-        .box input {
+        input {
+            display: table-cell;
             margin-left: 10px;
             height: 40px;
             padding: 0 25px;
             transition: all 200ms;
+            width: 150px;
         }
 
-        .button {
+        div.row {
+            display: table-row;
+        }
+
+        button {
             background-color: #c2fbd7;
             border-radius: 50px;
             border-width: 0;
@@ -35,13 +43,13 @@
             color: rgb(133, 159, 162);
             font-weight: bold;
             cursor: pointer;
-            display: inline-block;
             font-family: Arial, sans-serif;
             font-size: 1em;
             height: 40px;
-            padding: 0 25px;
+            padding: 0 50px;
             transition: all 200ms;
-            margin-left: 30px;
+            margin-left: 30%;
+            margin-right: 30%;
         }
 
         body {
@@ -56,18 +64,26 @@
     <div class="box ">
         <form id="your_form"
             action="javascript:download(document.getElementById('fromDate').value,document.getElementById('toDate').value)">
-            <label for="say">From Date</label>
-            <input type="date" id="fromDate" name="fromDate" min='1899-01-01' max='3000-01-01'>
-            <label for="to">To Date</label>
-            <input type="date" id="toDate" name="toDate" min='1899-01-01' max='3000-01-01'>
+            <div class="row">
+                <label for="say">Username</label>
+                <input type="text" id="username" name="username" required>
+                <label for="say">Password</label>
+                <input type="text" id="password" name="password" required>
+            </div>
+            <br>
+            <div class="row">
+                <label for="say">From Date</label>
+                <input type="date" id="fromDate" name="fromDate" min='1899-01-01' max='3000-01-01'>
+                <label for="to">To Date</label>
+                <input type="date" id="toDate" name="toDate" min='1899-01-01' max='3000-01-01'>
+            </div>
+            <br>
             <button class="button" type="submit" class="btn btn-primary">Generate Report</button>
         </form>
     </div>
     <!-- Script -->
     <script type="text/javascript">
-        var HOST_NAME = "https://<host-name>"
-        var USER = "user"
-        var PASSWORD = "password"
+        var HOST_NAME = location.protocol + "//" + location.host
         var today = new Date();
         var dd = today.getDate();
         var mm = today.getMonth() + 1; //January is 0!
@@ -75,11 +91,9 @@
         if (dd < 10) {
             dd = '0' + dd;
         }
-
         if (mm < 10) {
             mm = '0' + mm;
         }
-
         today = yyyy + '-' + mm + '-' + dd;
         document.getElementById("fromDate").setAttribute("value", today);
         document.getElementById("toDate").setAttribute("value", today);
@@ -87,7 +101,7 @@
             var postData = new FormData();
             var xhr = new XMLHttpRequest();
             xhr.open("GET", HOST_NAME + "/api/report/" + fromDate + "/" + toDate, true);
-            xhr.setRequestHeader("Authorization", authenticateUser(USER, PASSWORD));
+            xhr.setRequestHeader("Authorization", authenticateUser(document.getElementById("username").value, document.getElementById("password").value));
             xhr.responseType = 'blob';
             xhr.onload = function (e) {
                 var blob = xhr.response;
