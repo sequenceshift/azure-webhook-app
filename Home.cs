@@ -15,11 +15,11 @@ namespace Company.Function
     {
         [FunctionName("Home")]
         public static async Task<HttpResponseMessage> Run(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "home")] HttpRequest req,
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "home")] HttpRequest req,ExecutionContext context,
             ILogger log)
         {
-            var mappedPath = Path.GetFullPath("report.html");
-            var stream = new FileStream(@mappedPath, FileMode.Open);
+            var path = $"{context.FunctionAppDirectory}/report.html";
+            var stream = new FileStream(@path, FileMode.Open);
             var response = new HttpResponseMessage(HttpStatusCode.OK);
             response.Content = new StreamContent(stream);
             response.Content.Headers.ContentType = new MediaTypeHeaderValue("text/html");
