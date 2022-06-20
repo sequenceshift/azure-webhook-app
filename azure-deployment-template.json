@@ -436,5 +436,11 @@
             }
         }
     ],
-    "outputs": {}
+    "outputs": {
+        "functionHostName":{
+            "type":"string",
+            "value": "[reference(resourceId('Microsoft.Web/sites',  variables('funcAppName')), '2018-02-01').defaultHostName]"
+        }
+    }
+    
 }
