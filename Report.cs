@@ -107,43 +107,60 @@ namespace Company.Function
                     {
                         var json = JsonConvert.SerializeObject(documentItem);
                         JToken responseBody = JToken.FromObject(documentItem);
-                        string uuid = responseBody["user_id"].ToString();
-
-                        Uri collectionUri = UriFactory.CreateDocumentCollectionUri("outDatabase", "UserCollection");
-                        IDocumentQuery<dynamic> query = userDocument.CreateDocumentQuery(collectionUri,
-                        "SELECT * FROM c WHERE c.id='" + uuid + "'",
-                        new FeedOptions
-                        {
-                            PopulateQueryMetrics = true,
-                            MaxItemCount = -1,
-                            MaxDegreeOfParallelism = -1,
-                            EnableCrossPartitionQuery = true
-                        }
-
-                        ).AsDocumentQuery();
-                        //query if user already in db
-                        FeedResponse<dynamic> sqlResult = await query.ExecuteNextAsync();
                         string username = null;
                         string instanceName = null;
-                        if (sqlResult.Count == 0)
+                        string service = null;
+                        try
                         {
-                            //call user api to get user_name and instance
-                            JToken userInfo = getUserInfo(uuid, log);
-                            if (userInfo != null)
-                            {
-                                username = userInfo["user_name"].ToString();
-                                instanceName = userInfo["instance"].ToString();
+                            service = responseBody["service"].ToString();
 
-                                await userDocument.CreateDocumentAsync(collectionUri, userInfo);
-
-                            }
                         }
-                        else
+                        catch
                         {
-                            //populate user_name and instance from sql query
-                            JToken jsonResult = JToken.FromObject(sqlResult);
-                            username = jsonResult[0]["user_name"].ToString();
-                            instanceName = jsonResult[0]["instance"].ToString();
+                            service = "payline";
+                        }
+
+                        if (service == null || service == "payline")
+                        {
+                            string uuid = responseBody["user_id"].ToString();
+
+                            Uri collectionUri = UriFactory.CreateDocumentCollectionUri("outDatabase", "UserCollection");
+                            IDocumentQuery<dynamic> query = userDocument.CreateDocumentQuery(collectionUri,
+                            "SELECT * FROM c WHERE c.id='" + uuid + "'",
+                            new FeedOptions
+                            {
+                                PopulateQueryMetrics = true,
+                                MaxItemCount = -1,
+                                MaxDegreeOfParallelism = -1,
+                                EnableCrossPartitionQuery = true
+                            }
+
+                            ).AsDocumentQuery();
+                            //query if user already in db
+                            FeedResponse<dynamic> sqlResult = await query.ExecuteNextAsync();
+
+                            if (sqlResult.Count == 0)
+                            {
+                                //call user api to get user_name and instance
+                                JToken userInfo = getUserInfo(uuid, log);
+                                if (userInfo != null)
+                                {
+                                    username = userInfo["user_name"].ToString();
+                                    instanceName = userInfo["instance"].ToString();
+
+                                    await userDocument.CreateDocumentAsync(collectionUri, userInfo);
+
+                                }
+                            }
+                            else
+                            {
+                                //populate user_name and instance from sql query
+                                JToken jsonResult = JToken.FromObject(sqlResult);
+                                username = jsonResult[0]["user_name"].ToString();
+                                instanceName = jsonResult[0]["instance"].ToString();
+                            }
+
+
                         }
 
                         foreach (ReportHeader a in Enum.GetValues(typeof(ReportHeader)))
@@ -157,7 +174,9 @@ namespace Company.Function
                         {
                             worksheet.Cells[row, (int)ReportHeader.user_name + 1].Value = username;
                             worksheet.Cells[row, (int)ReportHeader.instance + 1].Value = instanceName;
+
                         }
+                        worksheet.Cells[row, (int)ReportHeader.service + 1].Value = service;
                         row = row + 1;
                     }
 
