@@ -1,13 +1,9 @@
 using System;
 using System.Threading.Tasks;
-using System.IO;
 using System.Collections.Generic;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
 using SendGrid.Helpers.Mail;
-using OfficeOpenXml;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using Microsoft.Azure.Documents.Client;
 using Microsoft.Azure.Documents.Linq;
 namespace Company.Function
@@ -15,43 +11,6 @@ namespace Company.Function
 {
     public static class SendEmail
     {
-        public static byte[] excelAttachment(IEnumerable<object> inputDocument)
-        {
-            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
-            MemoryStream memorystream = new MemoryStream();
-            using (ExcelPackage excel = new ExcelPackage())
-            {
-
-                var worksheet = excel.Workbook.Worksheets.Add("Report1");
-
-                // build exel header
-                var headerRow = new List<string[]>();
-                var arr = Enum.GetNames(typeof(ReportHeader));
-                headerRow.Add(arr);
-                String upRange = (headerRow[0].Length + 64) > 90 ? "A" + Char.ConvertFromUtf32(headerRow[0].Length + 38) : Char.ConvertFromUtf32(headerRow[0].Length + 64);
-                string headerRange = "A1:" + upRange + "1";
-                worksheet.Cells[headerRange].LoadFromArrays(headerRow);
-
-                // build report content
-                int row = 2;
-                int numCol = worksheet.Dimension.Columns;
-                foreach (var documentItem in inputDocument)
-                {
-                    var json = JsonConvert.SerializeObject(documentItem);
-                    JToken responseBody = JToken.FromObject(documentItem);
-                    foreach (ReportHeader a in Enum.GetValues(typeof(ReportHeader)))
-                    {
-                        string cellValue = responseBody[a.ToString()] != null ? responseBody[a.ToString()].ToString().Replace("\n", "").Replace("\r", "") : null;
-                        worksheet.Cells[row, (int)a + 1].Value = cellValue;
-                    }
-                    row = row + 1;
-                }
-
-                excel.SaveAs(memorystream);
-
-            }
-            return memorystream.ToArray();
-        }
 
         [FunctionName("SendEmailTimer")]
         [return: SendGrid(ApiKey = "SendGridApiKey")]

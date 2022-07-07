@@ -17,10 +17,8 @@ using Microsoft.Azure.Documents.Linq;
 namespace Company.Function
 
 {
-
     public static class ReportHelper
     {
-
         public static byte[] excelAttachment(IEnumerable<object> inputDocument)
         {
             ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
@@ -95,7 +93,6 @@ namespace Company.Function
                     try
                     {
                         service = responseBody["service"].ToString();
-
                     }
                     catch
                     {
@@ -142,7 +139,6 @@ namespace Company.Function
                             instanceName = jsonResult[0]["instance"].ToString();
                         }
 
-
                     }
 
                     foreach (ReportHeader a in Enum.GetValues(typeof(ReportHeader)))
@@ -164,9 +160,7 @@ namespace Company.Function
                 excel.SaveAs(memorystream);
             }
             return memorystream.ToArray();
-
         }
-
 
         public static async Task<IEnumerable<object>> queryDB(DocumentClient webhookDocument, DateTime fromDate, DateTime toDate, ILogger log)
         {
@@ -212,30 +206,20 @@ namespace Company.Function
                     var concurrentTasks = new List<Task>();
                     foreach (var item in sqlResult)
                     {
-                        // concurrentTasks.Add(webhookDocument.UpsertDocumentAsync(item, new{payment_date_utc="dd"}));
-                        //item.("payment_date_utc", "jj");
-
                         Document doc = item;
                         JToken jsonItem = JToken.FromObject(item);
-
                         var payment_date = jsonItem["payment_date"].ToString();
-
                         string convertedDate = ReportHelper.convertDateToUTC(payment_date).ToString("yyyy-MM-dd HH:mm:ss");
 
                         doc.SetPropertyValue("payment_date_utc", convertedDate);
                         await webhookDocument.ReplaceDocumentAsync(doc);
-
                     }
-
                 }
-
-
             }
             catch (Exception e)
             {
                 log.LogInformation(e.Message);
             }
-
         }
         private static string getSignature(string date, string accessSecret)
         {
