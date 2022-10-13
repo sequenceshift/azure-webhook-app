@@ -30,7 +30,7 @@
         },
         "GitHubBranch": {
             "type": "string",
-            "defaultValue": "main",
+            "defaultValue": "webhook-simple",
             "metadata": {
                 "description": "Name of the branch to use when deploying."
             }
