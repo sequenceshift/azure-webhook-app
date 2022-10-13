@@ -63,18 +63,6 @@
         "role_name": {
             "defaultValue": "[newGuid()]",
             "type": "String"
-        },
-        "apiAccessKey": {
-            "defaultValue":"",
-            "type": "String"
-        },
-        "apiAccessSecret": {
-            "defaultValue": "",
-            "type": "String"
-        },
-        "apiEndpoint": {
-            "defaultValue": "",
-            "type": "String"
         }
     },
     "variables": {
